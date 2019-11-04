@@ -3,6 +3,7 @@ package com.example.android.evince;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.android.evince.adapter.RvMatrixAdapter;
 import com.example.android.evince.databinding.ActivityMainBinding;
 import com.example.android.evince.pojo.Matrix;
 import com.example.android.evince.viewutils.ViewUtils;
@@ -22,23 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int mRows;
     private int mColumns;
     private Random random = new Random();
-    private List<Matrix> matrixList = new ArrayList<>();
-
-    public int getRows() {
-        return mRows;
-    }
-
-    public void setRows(int mRows) {
-        this.mRows = mRows;
-    }
-
-    public int getColumns() {
-        return mColumns;
-    }
-
-    public void setColumns(int mColumns) {
-        this.mColumns = mColumns;
-    }
+    private List<Matrix> mList = new ArrayList<>();
 
     public Random getRandom() {
         return random;
@@ -61,16 +46,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setRecyclerView(int rows, int columns) {
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, columns);
-        
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, columns != 0 ? columns : 5);
+        mBinding.viewRv.setLayoutManager(gridLayoutManager);
+        mList = getMatrix(rows, columns);
+        RvMatrixAdapter rvMatrixAdapter = new RvMatrixAdapter(this, mList);
+        mBinding.viewRv.setAdapter(rvMatrixAdapter);
     }
 
-    private int getRandomNumber(int row, int column) {
-        return random.nextInt(getTotalItems(row, column) + 1);
+    public int getRows() {
+        return mRows;
+    }
+
+    public void setRows(int mRows) {
+        this.mRows = mRows;
+    }
+
+    public int getColumns() {
+        return mColumns;
+    }
+
+    public void setColumns(int mColumns) {
+        this.mColumns = mColumns;
+    }
+
+    private List<Matrix> getMatrix(int rows, int columns) {
+        int max = getTotalItems(rows, columns);
+        for (int i = 0; i < max; i++) {
+            mList.add(new Matrix(i));
+        }
+        return mList;
     }
 
     private int getTotalItems(int rows, int columns) {
         return rows * columns;
+    }
+
+    private int getRandomNumber(int row, int column) {
+        return random.nextInt(getTotalItems(row, column) + 1);
     }
 
     @Override
@@ -78,10 +90,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.view_mbtn_apply:
                 if (isValidInput()) {
-
+                    setRecyclerView();
                 }
                 break;
         }
+    }
+
+    private void setRecyclerView() {
+        setRows(Integer.parseInt(StringUtils.getString(mBinding.viewTietRows, "0")));
+        setColumns(Integer.parseInt(StringUtils.getString(mBinding.viewTietRows, "0")));
+        setRecyclerView(getRows(), getColumns());
     }
 
     private boolean isValidInput() {

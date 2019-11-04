@@ -15,9 +15,15 @@ public final class ViewUtils {
         }
     }
 
-    public static boolean hasTextValue(EditText editText){
+    public static boolean hasTextValue(EditText editText) {
         return editText != null && !editText.getText().toString().trim().isEmpty();
     }
 
-
+    public static void setEnable(boolean enable, View... views) {
+        if (views != null && views.length > 0) {
+            for (View view : views) {
+                view.setEnabled(enable);
+            }
+        }
+    }
 }
