@@ -4,16 +4,18 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.android.evince.adapter.RvMatrixAdapter;
+import com.example.android.evince.apputils.AppUtils;
+import com.example.android.evince.constants.AppConstants;
 import com.example.android.evince.database.AppDatabase;
 import com.example.android.evince.databinding.ActivityMainBinding;
 import com.example.android.evince.pojo.Matrix;
+import com.example.android.evince.utils.SharedPrefs;
 import com.example.android.evince.utils.Utils;
 import com.example.android.evince.viewutils.ViewUtils;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -25,39 +27,94 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ActivityMainBinding mBinding;
     private int mRows;
     private int mColumns;
-    private Random random = new Random();
+    private int randomColor;
+    private int randomNumber;
     private List<Matrix> mList = new ArrayList<>();
 
-    public Random getRandom() {
-        return random;
+    public int getRandomColor() {
+        return randomColor;
     }
 
-    public void setRandom(Random random) {
-        this.random = random;
+    public int getRandomNumber() {
+        return randomNumber;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        initControls();
         handleViews();
         ViewUtils.setOnClickListener(this, mBinding.viewMbtnApply, mBinding.viewMbtnRandom);
     }
 
+    private void initControls() {
+        if (SharedPrefs.getInt(this, AppConstants.STR_ROWS, -1) != -1) {
+            setRows(SharedPrefs.getInt(this, AppConstants.STR_ROWS, -1), true, false);
+        }
+        if (SharedPrefs.getInt(this, AppConstants.STR_COLUMNS, -1) != -1) {
+            setColumns(SharedPrefs.getInt(this, AppConstants.STR_COLUMNS, -1), true, false);
+        }
+        if (SharedPrefs.getInt(this, AppConstants.STR_RANDOM_NUMBER, -1) != -1) {
+            setRandomNumber(SharedPrefs.getInt(this, AppConstants.STR_RANDOM_NUMBER, -1), true, false);
+        }
+        if (SharedPrefs.getInt(this, AppConstants.STR_RANDOM_COLOR, -1) != -1) {
+            setRandomColor(SharedPrefs.getInt(this, AppConstants.STR_RANDOM_COLOR, -1), true, false);
+        }
+    }
+
     private void handleViews() {
-        if (Utils.isNotNullNotEmpty(AppDatabase.getInstance(this).getAppDao().getAllMatrices())){
+        if (Utils.isNotNullNotEmpty(AppDatabase.getInstance(this).getAppDao().getAllMatrices())) {
             mList = AppDatabase.getInstance(this).getAppDao().getAllMatrices();
-            setRows(mList.get(0).getRows());
-            setColumns(mList.get(0).getColumns());
         }
         setRecyclerView(getRows(), getColumns());
+    }
+
+    public void setRows(int mRows, boolean setViewValue, boolean savePrefs) {
+        this.mRows = mRows;
+        if (mBinding != null && mRows >= 0 && setViewValue) {
+            mBinding.viewTietRows.setText(String.valueOf(mRows));
+        }
+        if (savePrefs) {
+            SharedPrefs.saveInt(this, AppConstants.STR_ROWS, mRows);
+        }
+    }
+
+    public void setColumns(int mColumns, boolean setViewValue, boolean savePrefs) {
+        this.mColumns = mColumns;
+        if (mBinding != null && mColumns >= 0 && setViewValue) {
+            mBinding.viewTietColumns.setText(String.valueOf(mColumns));
+        }
+        if (savePrefs) {
+            SharedPrefs.saveInt(this, AppConstants.STR_COLUMNS, mColumns);
+        }
+    }
+
+    public void setRandomNumber(int randomNumber, boolean setViewValue, boolean savePrefs) {
+        this.randomNumber = randomNumber;
+        if (setViewValue) {
+            mBinding.viewTvRandomNumber.setText(String.valueOf(randomNumber));
+        }
+        if (savePrefs) {
+            SharedPrefs.saveInt(this, AppConstants.STR_RANDOM_NUMBER, randomNumber);
+        }
+    }
+
+    public void setRandomColor(int randomColor, boolean setViewValue, boolean savePrefs) {
+        this.randomColor = randomColor;
+        if (setViewValue) {
+            mBinding.viewTvRandomColor.setText(String.valueOf(randomColor));
+        }
+        if (savePrefs) {
+            SharedPrefs.saveInt(this, AppConstants.STR_RANDOM_COLOR, randomColor);
+        }
     }
 
     private void setRecyclerView(int rows, int columns) {
         mList = new ArrayList<>();
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, columns != 0 ? columns : 5, columns > rows ? RecyclerView.HORIZONTAL : RecyclerView.VERTICAL, false);
         mBinding.viewRv.setLayoutManager(gridLayoutManager);
-        mList = getMatrix(rows, columns);
+        mList = AppUtils.getMatrix(rows, columns);
         RvMatrixAdapter rvMatrixAdapter = new RvMatrixAdapter(this, mList);
         mBinding.viewRv.setAdapter(rvMatrixAdapter);
     }
@@ -66,32 +123,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return mRows;
     }
 
-    public void setRows(int mRows) {
-        this.mRows = mRows;
-    }
-
     public int getColumns() {
         return mColumns;
-    }
-
-    public void setColumns(int mColumns) {
-        this.mColumns = mColumns;
-    }
-
-    private List<Matrix> getMatrix(int rows, int columns) {
-        int max = getTotalItems(rows, columns);
-        for (int i = 0; i < max; i++) {
-            mList.add(new Matrix(i));
-        }
-        return mList;
-    }
-
-    private int getTotalItems(int rows, int columns) {
-        return rows * columns;
-    }
-
-    private int getRandomNumber(int row, int column) {
-        return random.nextInt(getTotalItems(row, column) + 1);
     }
 
     @Override
@@ -102,13 +135,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     setRecyclerView();
                 }
                 break;
+            case R.id.view_mbtn_random:
+                if (isValidInput()) {
+                    if (Utils.isNotNullNotEmpty(mList)) {
+                        generateRandomNumber();
+                    } else {
+                        showMessage(getString(R.string.st_error_random_number_cannot_be_generated_before_matrix));
+                    }
+                }
+                break;
         }
-    }
-
-    private void setRecyclerView() {
-        setRows(Integer.parseInt(StringUtils.getString(mBinding.viewTietRows, "0")));
-        setColumns(Integer.parseInt(StringUtils.getString(mBinding.viewTietColumns, "0")));
-        setRecyclerView(getRows(), getColumns());
     }
 
     private boolean isValidInput() {
@@ -122,7 +158,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
+    private void setRecyclerView() {
+        setRows(Integer.parseInt(StringUtils.getString(mBinding.viewTietRows, "0")), true, false);
+        setColumns(Integer.parseInt(StringUtils.getString(mBinding.viewTietColumns, "0")), true, false);
+        saveRowsAndColumnsPrefs(getRows(), getColumns());
+        setRecyclerView(getRows(), getColumns());
+    }
+
+    private void generateRandomNumber() {
+        int randomNumber = Utils.getRandomNumber(getRows(), getColumns());
+        setRandomNumber(randomNumber, true, false);
+        SharedPrefs.saveInt(this, AppConstants.STR_RANDOM_NUMBER, randomNumber);
+
+        int randomColor = Utils.getRandomHSVColor();
+        setRandomColor(randomColor, true, false);
+        SharedPrefs.saveInt(this, AppConstants.STR_RANDOM_COLOR, randomColor);
+    }
+
     private void showMessage(String message) {
-        Snackbar.make(mBinding.viewCoor, message, Snackbar.LENGTH_LONG);
+        Snackbar.make(mBinding.viewCoor, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    private void saveRowsAndColumnsPrefs(int rows, int columns) {
+        SharedPrefs.savePrefs(this, AppConstants.STR_ROWS, String.valueOf(rows));
+        SharedPrefs.savePrefs(this, AppConstants.STR_COLUMNS, String.valueOf(columns));
     }
 }

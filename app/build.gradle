@@ -52,5 +52,6 @@ static void androidSupportLibs(config) {
 
 static void utilities(config){
     config.implementation 'io.supercharge:shimmerlayout:2.1.0'
+    config.implementation 'com.google.guava:guava:28.0-android'
 }
 

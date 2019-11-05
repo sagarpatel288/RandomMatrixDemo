@@ -7,8 +7,6 @@ public class Matrix {
     private int number;
     private int color;
     private boolean isSelected;
-    private int rows;
-    private int columns;
 
     public Matrix(int number) {
         this.number = number;
@@ -23,22 +21,6 @@ public class Matrix {
         this.number = number;
         this.color = color;
         this.isSelected = isSelected;
-    }
-
-    public int getRows() {
-        return rows;
-    }
-
-    public void setRows(int rows) {
-        this.rows = rows;
-    }
-
-    public int getColumns() {
-        return columns;
-    }
-
-    public void setColumns(int columns) {
-        this.columns = columns;
     }
 
     public int getNumber() {
