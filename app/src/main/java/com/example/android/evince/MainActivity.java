@@ -159,28 +159,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setRecyclerView() {
-        setRows(Integer.parseInt(StringUtils.getString(mBinding.viewTietRows, "0")), true, false);
-        setColumns(Integer.parseInt(StringUtils.getString(mBinding.viewTietColumns, "0")), true, false);
-        saveRowsAndColumnsPrefs(getRows(), getColumns());
+        setRows(Integer.parseInt(StringUtils.getString(mBinding.viewTietRows, "0")), false, true);
+        setColumns(Integer.parseInt(StringUtils.getString(mBinding.viewTietColumns, "0")), false, true);
         setRecyclerView(getRows(), getColumns());
     }
 
     private void generateRandomNumber() {
         int randomNumber = Utils.getRandomNumber(getRows(), getColumns());
-        setRandomNumber(randomNumber, true, false);
-        SharedPrefs.saveInt(this, AppConstants.STR_RANDOM_NUMBER, randomNumber);
+        setRandomNumber(randomNumber, true, true);
 
         int randomColor = Utils.getRandomHSVColor();
-        setRandomColor(randomColor, true, false);
-        SharedPrefs.saveInt(this, AppConstants.STR_RANDOM_COLOR, randomColor);
+        setRandomColor(randomColor, true, true);
     }
 
     private void showMessage(String message) {
         Snackbar.make(mBinding.viewCoor, message, Snackbar.LENGTH_LONG).show();
-    }
-
-    private void saveRowsAndColumnsPrefs(int rows, int columns) {
-        SharedPrefs.savePrefs(this, AppConstants.STR_ROWS, String.valueOf(rows));
-        SharedPrefs.savePrefs(this, AppConstants.STR_COLUMNS, String.valueOf(columns));
     }
 }
