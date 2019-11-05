@@ -51,9 +51,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initControls() {
         if (SharedPrefs.getInt(this, AppConstants.STR_ROWS, -1) != -1) {
             setRows(SharedPrefs.getInt(this, AppConstants.STR_ROWS, -1), true, false);
+        } else {
+            setRows(AppConstants.DEFAULT_ROW_COLUMNS, true, true);
         }
         if (SharedPrefs.getInt(this, AppConstants.STR_COLUMNS, -1) != -1) {
             setColumns(SharedPrefs.getInt(this, AppConstants.STR_COLUMNS, -1), true, false);
+        } else {
+            setColumns(AppConstants.DEFAULT_ROW_COLUMNS, true, true);
         }
         if (SharedPrefs.getInt(this, AppConstants.STR_RANDOM_NUMBER, -1) != -1) {
             setRandomNumber(SharedPrefs.getInt(this, AppConstants.STR_RANDOM_NUMBER, -1), true, false);
@@ -66,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void handleViews() {
         if (Utils.isNotNullNotEmpty(AppDatabase.getInstance(this).getAppDao().getAllMatrices())) {
             mList = AppDatabase.getInstance(this).getAppDao().getAllMatrices();
+        } else {
+            mList = AppUtils.getMatrix(getRows(), getColumns());
         }
         setRecyclerView(getRows(), getColumns());
     }
@@ -111,10 +117,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setRecyclerView(int rows, int columns) {
-        mList = new ArrayList<>();
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, columns != 0 ? columns : 5, columns > rows ? RecyclerView.HORIZONTAL : RecyclerView.VERTICAL, false);
         mBinding.viewRv.setLayoutManager(gridLayoutManager);
-        mList = AppUtils.getMatrix(rows, columns);
         RvMatrixAdapter rvMatrixAdapter = new RvMatrixAdapter(this, mList);
         mBinding.viewRv.setAdapter(rvMatrixAdapter);
     }

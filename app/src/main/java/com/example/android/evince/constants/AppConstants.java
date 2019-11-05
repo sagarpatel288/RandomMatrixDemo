@@ -19,4 +19,5 @@ public class AppConstants {
     public static final String STR_COLUMNS = "columns";
     public static final String STR_RANDOM_NUMBER = "random_number";
     public static final String STR_RANDOM_COLOR = "random_color";
+    public static final int DEFAULT_ROW_COLUMNS = 5;
 }
