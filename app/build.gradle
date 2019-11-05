@@ -38,12 +38,16 @@ dependencies { config ->
 }
 
 static void androidSupportLibs(config) {
+    def room_version = "2.2.1"
+    def recyclerview_version = "1.0.0"
+
     //Native Android libraries
-    config.implementation "com.android.support:appcompat-v7:28.0.0"
-    config.implementation "com.android.support:support-v4:28.0.0"
-    config.implementation "com.android.support:design:28.0.0"
-    config.implementation "com.android.support:cardview-v7:28.0.0"
+    config.implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
     config.implementation "com.google.android.material:material:1.0.0"
+
+    //Room
+    config.implementation "androidx.room:room-runtime:$room_version"
+    config.annotationProcessor "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
 }
 
 static void utilities(config){

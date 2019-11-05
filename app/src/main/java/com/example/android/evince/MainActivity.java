@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.android.evince.adapter.RvMatrixAdapter;
+import com.example.android.evince.database.AppDatabase;
 import com.example.android.evince.databinding.ActivityMainBinding;
 import com.example.android.evince.pojo.Matrix;
+import com.example.android.evince.utils.Utils;
 import com.example.android.evince.viewutils.ViewUtils;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -43,6 +45,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void handleViews() {
+        if (Utils.isNotNullNotEmpty(AppDatabase.getInstance(this).getAppDao().getAllMatrices())){
+            mList = AppDatabase.getInstance(this).getAppDao().getAllMatrices();
+            setRows(mList.get(0).getRows());
+            setColumns(mList.get(0).getColumns());
+        }
         setRecyclerView(getRows(), getColumns());
     }
 

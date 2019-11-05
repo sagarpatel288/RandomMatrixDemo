@@ -1,5 +1,8 @@
 package com.example.android.evince.pojo;
 
+import androidx.room.Entity;
+
+@Entity
 public class Matrix {
     private int number;
     private int color;
