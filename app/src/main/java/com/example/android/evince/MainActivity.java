@@ -16,6 +16,7 @@ import java.util.Random;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -46,7 +47,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setRecyclerView(int rows, int columns) {
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, columns != 0 ? columns : 5);
+        mList = new ArrayList<>();
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, columns != 0 ? columns : 5, columns > rows ? RecyclerView.HORIZONTAL : RecyclerView.VERTICAL, false);
         mBinding.viewRv.setLayoutManager(gridLayoutManager);
         mList = getMatrix(rows, columns);
         RvMatrixAdapter rvMatrixAdapter = new RvMatrixAdapter(this, mList);
@@ -98,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setRecyclerView() {
         setRows(Integer.parseInt(StringUtils.getString(mBinding.viewTietRows, "0")));
-        setColumns(Integer.parseInt(StringUtils.getString(mBinding.viewTietRows, "0")));
+        setColumns(Integer.parseInt(StringUtils.getString(mBinding.viewTietColumns, "0")));
         setRecyclerView(getRows(), getColumns());
     }
 
