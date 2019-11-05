@@ -7,11 +7,12 @@ import com.example.android.evince.adapter.RvMatrixAdapter;
 import com.example.android.evince.apputils.AppUtils;
 import com.example.android.evince.constants.AppConstants;
 import com.example.android.evince.database.AppDatabase;
-import com.example.android.evince.databinding.ActivityMainBinding;
 import com.example.android.evince.pojo.Matrix;
 import com.example.android.evince.utils.SharedPrefs;
 import com.example.android.evince.utils.Utils;
 import com.example.android.evince.viewutils.ViewUtils;
+import com.example.android.stackexchange.R;
+import com.example.android.stackexchange.databinding.ActivityMainBinding;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
